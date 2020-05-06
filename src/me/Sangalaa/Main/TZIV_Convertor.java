@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
 
 public class TZIV_Convertor {
 	
-	private static final String FILENAME = "TZIV_project_TS_new_noOneMore.jff";
+	private static final String FILENAME = "";
 	
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
 		new TZIV_Convertor();
