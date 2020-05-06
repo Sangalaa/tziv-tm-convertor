@@ -44,7 +44,13 @@ public class TZIV_Convertor {
 		System.out.println(convertedFunction);
 	}
 	
-	public static String convertTransitionsToFunction(NodeList transitionsList, Map<String, String> statesMap) {
+	/**
+	 * This function is used to construct transition function.
+	 * @param transitionsList List of all transitions
+	 * @param statesMap Map of indexes mapped to state names
+	 * @return Returns transition function in String format
+	 */
+	public String convertTransitionsToFunction(NodeList transitionsList, Map<String, String> statesMap) {
 		if(transitionsList == null || statesMap == null) return null;
 		
 		Node node = null;
@@ -105,7 +111,12 @@ public class TZIV_Convertor {
 		return convertedFunctionBuilder.toString();
 	}
 	
-	public static String getStatesList(Map<String, String> statesMap) {
+	/**
+	 * This function is used to get list of all states.
+	 * @param statesMap Map of indexes mapped to state names
+	 * @return Returns list of all states separated by comma
+	 */
+	public String getStatesList(Map<String, String> statesMap) {
 		if(statesMap == null) return null;
 		
 		StringBuilder statesListBuilder = new StringBuilder();
@@ -128,7 +139,12 @@ public class TZIV_Convertor {
 		return statesListBuilder.toString();
 	}
 	
-	public static Map<String, String> extractStates(NodeList statesList) {
+	/**
+	 * This function is used to create map of indexes mapped to state names. It also find initial state and final states.
+	 * @param statesList List of states
+	 * @return Returns map of indexes mapped to state names
+	 */
+	public Map<String, String> extractStates(NodeList statesList) {
 		if(statesList == null) return null;
 		
 		Map<String, String> map = new HashMap<>();
