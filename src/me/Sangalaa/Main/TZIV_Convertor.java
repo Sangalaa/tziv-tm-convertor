@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
 
 public class TZIV_Convertor {
 	
-	private static final String FILENAME = "";
+	private static final String FILEPATH = "project.jff";
 	
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
 		new TZIV_Convertor();
@@ -31,7 +31,7 @@ public class TZIV_Convertor {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		
-		Document jFlapFile = builder.parse(new File(FILENAME));
+		Document jFlapFile = builder.parse(new File(FILEPATH));
 		jFlapFile.getDocumentElement().normalize();
 		
 		NodeList nodeList = jFlapFile.getElementsByTagName("state");
