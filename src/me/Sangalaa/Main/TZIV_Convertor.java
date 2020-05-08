@@ -3,7 +3,7 @@ package me.Sangalaa.Main;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -102,7 +102,10 @@ public class TZIV_Convertor {
 		
 		convertedFunctionBuilder.append("\nF = {" + statesMap.get("finalStates") + "}\n");
 		
-		for(int key : deltaFunctionsMap.keySet()) {
+		List<Integer> sortedKeys = new ArrayList<>(deltaFunctionsMap.keySet());
+		Collections.sort(sortedKeys);
+		
+		for(int key : sortedKeys) {
 			List<String> deltaFunctionsArray = deltaFunctionsMap.get(key);
 			
 			for(String function : deltaFunctionsArray) convertedFunctionBuilder.append(function);
@@ -130,10 +133,9 @@ public class TZIV_Convertor {
 			catch(NumberFormatException e) {}
 		}
 		
-		Object[] statesToArray = stateNumbers.toArray();
-		Arrays.sort(statesToArray);
+		Collections.sort(stateNumbers);
 		
-		for(Object state : statesToArray) statesListBuilder.append(statesMap.get(state.toString()) + ",");
+		for(Integer state : stateNumbers) statesListBuilder.append(statesMap.get(state.toString()) + ",");
 		statesListBuilder.deleteCharAt(statesListBuilder.length() - 1);
 		
 		return statesListBuilder.toString();
@@ -152,7 +154,7 @@ public class TZIV_Convertor {
 		Node node = null;
 		Element element = null;
 		
-		StringBuilder finalStatesBuilder = new StringBuilder();
+		List<Integer> finalStatesId = new ArrayList<>();
 		
 		String attributeId, attributeName;
 		
@@ -169,8 +171,14 @@ public class TZIV_Convertor {
 			map.put(attributeId, attributeName);
 			
 			if(element.getElementsByTagName("initial").item(0) != null) map.put("initial", attributeName);
-			if(element.getElementsByTagName("final").item(0) != null) finalStatesBuilder.append(attributeName + ",");
+			if(element.getElementsByTagName("final").item(0) != null) finalStatesId.add(Integer.parseInt(attributeId));
 		}
+		
+		Collections.sort(finalStatesId);
+		
+		StringBuilder finalStatesBuilder = new StringBuilder();
+		
+		for(Integer finalState : finalStatesId) finalStatesBuilder.append(map.get(finalState.toString()) + ",");
 		
 		finalStatesBuilder.deleteCharAt(finalStatesBuilder.length() - 1);
 		
