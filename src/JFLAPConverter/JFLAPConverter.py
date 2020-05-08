@@ -164,7 +164,7 @@ if __name__ == '__main__':
     parser.add_argument('output', type=str, help='Text file for list of states')
     args = parser.parse_args()
 
-    with open(args.output, 'w') as output:
+    with open(args.output, 'w', encoding='utf-8') as output:
         try:
             jflap = JFLAPConverter(args.input)
 
