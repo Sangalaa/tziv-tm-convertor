@@ -173,5 +173,5 @@ if __name__ == '__main__':
             for t in jflap.machine.transitions:
                 print(t, file=output)
 
-        except UnsupportedAutomataType:
+        except UnsupportedAutomataError:
             print("Supplied automaton type is not supported")
