@@ -11,7 +11,8 @@ class Automaton:
     DELTA = '\u03b4'
     SIGMA = '\u03a3'
     GAMMA = '\u0393'
-    BLANK = '\u25a0'
+    EPSILON = '\u03b5'
+    BLANK = '\u25a1'
 
     def __init__(self):
         self.states = {}
@@ -29,9 +30,8 @@ class Automaton:
         if state.find('final') is not None:
             self.final.append(name)
 
-    @staticmethod
-    def entity(element: xml.Element, name: str) -> str:
-        return element.find(name).text or Automaton.BLANK
+    def entity(self, element: xml.Element, name: str) -> str:
+        return element.find(name).text or self.EPSILON
 
     def alphabet_set(self, label) -> str:
         return f"{label} = {{{', '.join(sorted(self.alphabet))}}}"
@@ -116,6 +116,9 @@ class TuringMachine(Automaton):
 
         self.alphabet.update([read, write])
         self.transitions.append(transition)
+
+    def entity(self, element: xml.Element, name: str) -> str:
+        return element.find(name).text or self.BLANK
 
     @property
     def definition(self) -> List[str]:
