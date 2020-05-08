@@ -21,6 +21,10 @@ class Automaton:
         self.alphabet = set()
         self.transitions = []
 
+    def new_alphabet_symbol(self, symbol):
+        if symbol is not None:
+            self.alphabet.add(symbol)
+
     def new_state(self, state: xml.Element):
         name = state.attrib['name']
         self.states[state.attrib['id']] = name
@@ -54,8 +58,8 @@ class FiniteAutomaton(Automaton):
         read = self.entity(transition, 'read')
 
         transition = f"{self.DELTA}({q1}, {read}) = {q2}"
+        self.new_alphabet_symbol(read)
 
-        self.alphabet.update(read)
         self.transitions.append(transition)
 
     @property
@@ -74,19 +78,23 @@ class PushdownAutomaton(Automaton):
         super().__init__()
         self.stack_alphabet = set()
 
+    def new_stack_symbol(self, symbol):
+        if symbol is not None:
+            self.stack_alphabet.update(symbol)
+
     def new_transition(self, transition):
         q1 = self.states[self.entity(transition, 'from')]
         q2 = self.states[self.entity(transition, 'to')]
+
         read = self.entity(transition, 'read')
         pop = self.entity(transition, 'pop')
         push = self.entity(transition, 'push')
 
         transition = f"{self.DELTA}({q1}, {read}, {pop}) = ({q2}, {push})"
+        self.new_alphabet_symbol(read)
+        self.new_stack_symbol(pop)
+        self.new_stack_symbol(push)
 
-        self.stack_alphabet.update(pop)
-        self.stack_alphabet.update(push)
-
-        self.alphabet.update(read)
         self.transitions.append(transition)
 
     @property
@@ -108,17 +116,16 @@ class TuringMachine(Automaton):
     def new_transition(self, transition: xml.Element):
         q1 = self.states[self.entity(transition, 'from')]
         q2 = self.states[self.entity(transition, 'to')]
+
         read = self.entity(transition, 'read')
         write = self.entity(transition, 'write')
         move = self.entity(transition, 'move')
 
         transition = f"{self.DELTA}({q1}, {read}) = ({q2}, {write}, {move})"
+        self.new_alphabet_symbol(read)
+        self.new_alphabet_symbol(write)
 
-        self.alphabet.update([read, write])
         self.transitions.append(transition)
-
-    def entity(self, element: xml.Element, name: str) -> str:
-        return element.find(name).text or self.BLANK
 
     @property
     def definition(self) -> List[str]:
