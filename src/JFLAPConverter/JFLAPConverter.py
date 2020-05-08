@@ -47,7 +47,7 @@ class Automaton:
         return element.find(name).text
 
     def alphabet_set(self, label) -> str:
-        return f"{label} = {{{', '.join(self.alphabet)}}}"
+        return f"{label} = {{{', '.join(sorted(self.alphabet))}}}"
 
     def states_set(self, label) -> str:
         s = [self.states[key] for key in sorted(self.states)]
