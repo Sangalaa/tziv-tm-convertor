@@ -1,5 +1,6 @@
 import argparse
 import xml.etree.ElementTree as xml
+from collections import defaultdict
 from typing import List
 
 
@@ -19,7 +20,15 @@ class Automaton:
         self.initial = ''
         self.final = []
         self.alphabet = set()
-        self.transitions = []
+        self.transitions = defaultdict(list)
+
+    @property
+    def delta_function(self):
+        delta = []
+        for state in sorted(self.transitions):
+            for trans in self.transitions[state]:
+                delta.append(trans)
+        return delta
 
     def new_alphabet_symbol(self, symbol):
         if symbol is not None:
@@ -35,16 +44,17 @@ class Automaton:
             self.final.append(name)
 
     def entity(self, element: xml.Element, name: str) -> str:
-        return element.find(name).text or self.EPSILON
+        return element.find(name).text
 
     def alphabet_set(self, label) -> str:
-        return f"{label} = {{{', '.join(sorted(self.alphabet))}}}"
+        return f"{label} = {{{', '.join(self.alphabet)}}}"
 
     def states_set(self, label) -> str:
-        return f"{label} = {{{', '.join(sorted(self.states.values()))}}}"
+        s = [self.states[key] for key in sorted(self.states)]
+        return f"{label} = {{{', '.join(s)}}}"
 
     def final_states_set(self, label) -> str:
-        return f"{label} = {{{', '.join(sorted(self.final))}}}"
+        return f"{label} = {{{', '.join(self.final)}}}"
 
 
 class FiniteAutomaton(Automaton):
@@ -55,12 +65,12 @@ class FiniteAutomaton(Automaton):
     def new_transition(self, transition: xml.Element):
         q1 = self.states[self.entity(transition, 'from')]
         q2 = self.states[self.entity(transition, 'to')]
-        read = self.entity(transition, 'read')
 
-        transition = f"{self.DELTA}({q1}, {read}) = {q2}"
+        read = self.entity(transition, 'read')
         self.new_alphabet_symbol(read)
 
-        self.transitions.append(transition)
+        transition = f"{self.DELTA}({q1}, {read or self.EPSILON}) = {q2}"
+        self.transitions[q1].append(transition)
 
     @property
     def definition(self) -> List[str]:
@@ -90,12 +100,13 @@ class PushdownAutomaton(Automaton):
         pop = self.entity(transition, 'pop')
         push = self.entity(transition, 'push')
 
-        transition = f"{self.DELTA}({q1}, {read}, {pop}) = ({q2}, {push})"
         self.new_alphabet_symbol(read)
         self.new_stack_symbol(pop)
         self.new_stack_symbol(push)
 
-        self.transitions.append(transition)
+        transition = (f'{self.DELTA}({q1}, {read or self.EPSILON}, {pop or self.EPSILON})'
+                      f'= ({q2}, {push or self.EPSILON})')
+        self.transitions[q1].append(transition)
 
     @property
     def definition(self) -> List[str]:
@@ -121,11 +132,12 @@ class TuringMachine(Automaton):
         write = self.entity(transition, 'write')
         move = self.entity(transition, 'move')
 
-        transition = f"{self.DELTA}({q1}, {read}) = ({q2}, {write}, {move})"
         self.new_alphabet_symbol(read)
         self.new_alphabet_symbol(write)
 
-        self.transitions.append(transition)
+        transition = (f"{self.DELTA}({q1}, {read or self.BLANK}) = "
+                      f"({q2}, {write or self.BLANK}, {move})")
+        self.transitions[q1].append(transition)
 
     @property
     def definition(self) -> List[str]:
@@ -177,7 +189,7 @@ if __name__ == '__main__':
 
             for d in jflap.machine.definition:
                 print(d, file=output)
-            for t in jflap.machine.transitions:
+            for t in jflap.machine.delta_function:
                 print(t, file=output)
 
         except UnsupportedAutomataError:
